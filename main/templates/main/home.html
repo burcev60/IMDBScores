@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMDB Scores</title>
+    <style>
+        /* Оформление страницы */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+            overflow: hidden;
+            border-radius: 5px;
+            border: 1px solid;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IMDB Score</h1>
+        <p>This is where you can enter a movie review, and we will predict the rating and sentiment for you.</p>
+
+        <div class="form-group">
+            <textarea id="review" rows="4" placeholder="Enter your movie review here"></textarea>
+            <button id="submit-btn">Submit</button>
+        </div>
+
+        <div id="prediction" class="result" style="display:none;">
+            <p><strong>Review Sentiment:</strong> <span id="sentiment"></span></p>
+            <p><strong>Predicted Score:</strong> <span id="score"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const review = document.getElementById('review').value;
+
+            fetch('/predict/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: 'review=' + encodeURIComponent(review)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('sentiment').innerText = data.sentiment;
+                document.getElementById('score').innerText = data.score;
+                document.getElementById('prediction').style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
