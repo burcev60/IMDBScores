@@ -1,18 +1,19 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import joblib
-import pickle
-import string
+import os
 import re
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.stem import SnowballStemmer
 from bs4 import BeautifulSoup
-from sklearn.feature_extraction.text import TfidfVectorizer
+from django.conf import settings
 
+custom_stopwords_path = os.path.join(settings.BASE_DIR, 'main', 'static', 'stopwords', 'english')
+
+with open(custom_stopwords_path, 'r', encoding='utf-8') as f:
+    custom_stopwords = f.read().splitlines()
 
 def strip_html(text):
     soup = BeautifulSoup(text, "html.parser")
@@ -33,7 +34,7 @@ def remove_special_characters(text, remove_digits=True):
 
 def remove_stopwords(text):
     tokenizer=ToktokTokenizer()
-    stopword_list=nltk.corpus.stopwords.words('english')
+    stopword_list= custom_stopwords
     tokens = tokenizer.tokenize(text)
     tokens = [token.strip() for token in tokens]
     filtered_tokens = [token for token in tokens if token not in stopword_list]
